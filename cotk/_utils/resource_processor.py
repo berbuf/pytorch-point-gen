@@ -259,13 +259,6 @@ class SSTResourceProcessor(BaseResourceProcessor):
 
 class CNNResourceProcessor(BaseResourceProcessor):
     '''Processor for CNN dataset
-
-    Download Stanford CoreNLP
-    We will need Stanford CoreNLP to tokenize the data. Download it here and unzip it. Then add the following command to your bash_profile:
-    export CLASSPATH=/path/to/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar    
-    replacing /path/to/ with the path to where you saved the stanford-corenlp-full-2016-10-31 directory.
-
-    see https://github.com/abisee/cnn-dailymail
     '''
     def get_art_abs(self, file_path):
         def fix_missing_period(line):
@@ -287,6 +280,14 @@ class CNNResourceProcessor(BaseResourceProcessor):
                 article_lines.append(line)
         return ' '.join(article_lines), ' '.join(["%s %s %s" % ('<s>', sent, '</s>') for sent in lines[idx:]])
 
+    """
+    Download Stanford CoreNLP
+    We will need Stanford CoreNLP to tokenize the data. Download it here and unzip it. Then add the following command to your bash_profile:
+    export CLASSPATH=/path/to/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar    
+    replacing /path/to/ with the path to where you saved the stanford-corenlp-full-2016-10-31 directory.
+
+    see https://github.com/abisee/cnn-dailymail
+
     def tokenize_stories(self, src_dir, dst_dir):
         import subprocess
         stories = os.listdir(src_dir)
@@ -299,12 +300,13 @@ class CNNResourceProcessor(BaseResourceProcessor):
         if subprocess.call(command):
             raise(Exception("Java tokenizer not installed"))
         os.remove("mapping.txt")
+    """
 
-    def _postprocess(self, src_dir, tmp_dir, dest_dir, key):
-        self.tokenize_stories(src_dir, tmp_dir)
+    def _postprocess(self, src_dir, dest_dir, key):
+        #self.tokenize_stories(src_dir, tmp_dir)
         with open(os.path.join(dest_dir, key + ".txt") , 'w') as f:
-            for s in os.listdir(tmp_dir):
-                file_path = os.path.join(tmp_dir, s)
+            for s in os.listdir(src_dir):
+                file_path = os.path.join(src_dir, s)
                 article, abstract = self.get_art_abs(file_path)
                 f.write(article + "\n" + abstract + "\n")
 
@@ -319,7 +321,7 @@ class CNNResourceProcessor(BaseResourceProcessor):
                 raise FileNotFoundError(
                     "there isn\'t %s in %s" % (key, local_path))
             else:
-                self._postprocess(dir_path, tmp_local_path, new_local_path, key)
+                self._postprocess(dir_path, new_local_path, key)
         return new_local_path
 
 class GloveResourceProcessor(ResourceProcessor):

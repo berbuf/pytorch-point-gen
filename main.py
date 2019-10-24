@@ -31,7 +31,6 @@ def main(args, load_exclude_set=[], restoreCallback=None):
     data_arg.file_id = args.datapath
 
     data_class = TextSummarization.load_class(args.dataset)
-    print (data_class(**data_arg))
     volatile.dm = try_cache(data_class, (*data_arg), args.cache_dir, data_class.__name__) if args.cache else data_class(**data_arg)
 
     param = Storage()

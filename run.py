@@ -77,6 +77,7 @@ def run(*argv):
     parser.add_argument('--show_sample', type=list, help="", default=[0])
     parser.add_argument('--epochs', type=int, default=100,
                         help="Epoch for training. Default: 100")
+    
     parser.add_argument('--batch_per_epoch', type=int, default=2,
                         help="Batches per epoch. Default: 1500")
     parser.add_argument('--batch_num_per_gradient', type=int, default=2,
