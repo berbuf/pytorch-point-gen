@@ -278,7 +278,7 @@ class CNNResourceProcessor(BaseResourceProcessor):
                 break
             if line != "":
                 article_lines.append(line)
-        return ' '.join(article_lines), ' '.join(["%s %s %s" % ('<s>', sent, '</s>') for sent in lines[idx:]])
+        return ' '.join(article_lines), ' '.join([ "%s %s %s" % ('<s>', sent, '</s>') for sent in lines[idx:] if sent != "@highlight" ])
 
     """
     Download Stanford CoreNLP

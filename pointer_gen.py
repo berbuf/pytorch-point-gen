@@ -27,8 +27,7 @@ class PointerGen(BaseModel):
         args = self.param.args
         self.summaryHelper = SummaryHelper("%s/%s_%s" %
                                            (args.log_dir, args.name, time.strftime(
-                                               "%H%M%S", time.localtime())),
-                                           args)
+                                               "%H%M%S", time.localtime())), args)
         self.trainSummary = self.summaryHelper.addGroup(
             scalar=["loss", "word_loss", "perplexity"],
             prefix="train")
@@ -162,8 +161,13 @@ class PointerGen(BaseModel):
             return None
         return self._preprocess_batch(data)
 
-    """
-
+    def test_process(self):
+        logging.info("Test Start.")
+        self.net.eval()
+        self.test("dev")
+        test_res = self.test("test")
+        logging.info("Test Finish.")
+        return test_res
 
     def test(self, key):
         args = self.param.args
@@ -213,12 +217,3 @@ class PointerGen(BaseModel):
             f.flush()
         logging.info("result output to %s.", filename)
         return {key: val for key, val in res.items() if isinstance(val, (str, int, float))}
-
-    def test_process(self):
-        logging.info("Test Start.")
-        self.net.eval()
-        self.test("dev")
-        test_res = self.test("test")
-        logging.info("Test Finish.")
-        return test_res
-    """

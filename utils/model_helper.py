@@ -22,7 +22,7 @@ class BaseModel():
 
         self.net = net
 
-        _ = list(self.net.get_parameters_by_name())
+        #_ = list(self.net.get_parameters_by_name())
         self.optimizerList = optimizerList
 
         self.now_batch = 0

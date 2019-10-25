@@ -10,8 +10,8 @@ import numpy as np
 from .._utils.file_utils import get_resource_file_path
 from .._utils import hooks
 from .dataloader import LanguageProcessingBase
-from ..metric import MetricChain, AccuracyMetric
-
+from ..metric import MetricChain, PerplexityMetric, BleuCorpusMetric, SingleTurnDialogRecorder
+#from ..metric import MetricChain, ,
 
 # pylint: disable=W0223
 class TextSummarization(LanguageProcessingBase):
@@ -81,7 +81,7 @@ class TextSummarization(LanguageProcessingBase):
                                         # second response: <go> hello <eos> <pad> <pad>
                                         [2, 7, 3, 0, 0],
                                 ]),
-
+xs
                                 # length of posts
                                 "post_length": numpy.array([5, 3]),
                                 # length of responses
@@ -89,15 +89,18 @@ class TextSummarization(LanguageProcessingBase):
                         }
                 '''
 
-
         if key not in self.key_name:
             raise ValueError("No set named %s." % key)
         res = {}
         batch_size = len(indexes)
-        res["post_length"] = np.array(list(map(lambda i: len(self.data[key]['post'][i]), indexes)))
-        res["resp_length"] = np.array(list(map(lambda i: len(self.data[key]['resp'][i]), indexes)))
-        res_post = res["post"] = np.zeros((batch_size, np.max(res["post_length"])), dtype=int)
-        res_resp = res["resp"] = np.zeros((batch_size, np.max(res["resp_length"])), dtype=int)
+        res["post_length"] = np.array(
+            list(map(lambda i: len(self.data[key]['post'][i]), indexes)))
+        res["resp_length"] = np.array(
+            list(map(lambda i: len(self.data[key]['resp'][i]), indexes)))
+        res_post = res["post"] = np.zeros(
+            (batch_size, np.max(res["post_length"])), dtype=int)
+        res_resp = res["resp"] = np.zeros(
+            (batch_size, np.max(res["resp_length"])), dtype=int)
         for i, j in enumerate(indexes):
             post = self.data[key]['post'][j]
             resp = self.data[key]['resp'][j]
@@ -109,6 +112,47 @@ class TextSummarization(LanguageProcessingBase):
         res_post[res_post >= self.valid_vocab_len] = self.unk_id
         res_resp[res_resp >= self.valid_vocab_len] = self.unk_id
         return res
+
+    def get_teacher_forcing_metric(self, gen_log_prob_key="gen_log_prob",
+                                       invalid_vocab=False):
+        '''
+                    It contains:
+        * :class:`.metric.PerplexityMetric`
+        
+            Arguments:
+                gen_log_prob_key (str):  The key of predicted log probability over words.
+                            Refer to :class:`.metric.PerplexityMetric`. Default: ``gen_log_prob``.
+                    invalid_vocab (bool): Whether ``gen_log_prob`` contains invalid vocab.
+                            Refer to :class:`.metric.PerplexityMetric`. Default: ``False``.
+        
+            Returns:
+                    A :class:`.metric.MetricChain` object.
+        '''
+        metric = MetricChain()
+        metric.add_metric(PerplexityMetric(self,
+                                           reference_allvocabs_key="resp_allvocabs",
+                                           reference_len_key="resp_length",
+                                           gen_log_prob_key=gen_log_prob_key,
+                                           invalid_vocab=invalid_vocab))
+        return metric
+    
+    def get_inference_metric(self, gen_key="gen"):
+        '''Get metrics for inference.
+            It contains:
+        * :class:`.metric.BleuCorpusMetric`
+        * :class:`.metric.SingleTurnDialogRecorder`
+        Arguments:
+                gen_key (str): The key of generated sentences in index form.
+                            Refer to :class:`.metric.BleuCorpusMetric` or
+                            :class:`.metric.SingleTurnDialogRecorder`. Default: ``gen``.
+            Returns:
+                    A :class:`.metric.MetricChain` object.
+            '''
+        metric = MetricChain()
+        metric.add_metric(BleuCorpusMetric(self, gen_key=gen_key, \
+                                           reference_allvocabs_key="resp_allvocabs"))
+        metric.add_metric(SingleTurnDialogRecorder(self, gen_key=gen_key))
+        return metric
 
     def get_metric(self, prediction_key="prediction"):
         pass
@@ -134,6 +178,7 @@ class TextSummarization(LanguageProcessingBase):
         return metric
     """
 
+
 class CNN(TextSummarization):
     '''A dataloader for preprocessed Cnn dataset.
     '''
@@ -151,7 +196,8 @@ class CNN(TextSummarization):
         r'''Loading dataset, invoked by `LanguageProcessingBase.__init__`
         '''
         return super()._general_load_data(self._file_path,
-                                          [['post', 'Sentence'], ["resp", "Sentence"]],
+                                          [['post', 'Sentence'], [
+                                              "resp", "Sentence"]],
                                           self._min_vocab_times,
                                           self._max_sent_length,
                                           None,

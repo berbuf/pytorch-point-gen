@@ -40,7 +40,7 @@ def main(args, load_exclude_set=[], restoreCallback=None):
     model = PointerGen(param)
     if args.mode == "train":
         model.train_process()
-    elif args.mode == "test":
+    elif args.mode == "eval":
         test_res = model.test_process()
         json.dump(test_res, open("./result.json", "w"))
     else:

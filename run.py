@@ -62,7 +62,7 @@ def run(*argv):
     parser.add_argument('--log_root', type=str,
                         help="Root directory for all logging.")
     parser.add_argument(
-        '--name', type=str, help="Name for experiment. Logs will be saved in a directory with this name, under log_root.", default=str(time.localtime()))
+        '--name', type=str, help="Name for experiment. Logs will be saved in a directory with this name, under log_root.", default=time.ctime(time.time()).replace(" ", "_"))
     parser.add_argument('--cuda', type=bool, help="", default=False)
     parser.add_argument('--cache', type=str, help="", default="")
     parser.add_argument('--droprate', type=float, help="", default=.0)
@@ -75,7 +75,7 @@ def run(*argv):
     parser.add_argument('--log_dir', type=str, default="./tensorboard",
                         help='Log directory for tensorboard. Default: ./tensorboard')
     parser.add_argument('--show_sample', type=list, help="", default=[0])
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=2,
                         help="Epoch for training. Default: 100")
     
     parser.add_argument('--batch_per_epoch', type=int, default=2,
@@ -97,6 +97,10 @@ def run(*argv):
     parser.add_argument('--seed', type=int, help='', default=42)
     parser.add_argument('--length_penalty', type=float, default=0.7,
                         help='The beamsearch penalty for short sentences. The penalty will get larger when this becomes smaller.')
+
+    parser.add_argument('--out_dir', type=str, default="./output", help='Output directory for test output. Default: ./output')
+    parser.add_argument('--restore_optimizer', type=bool, default=True, help='')
+
 
     args = Storage()
     for key, val in vars(parser.parse_args(argv)).items():

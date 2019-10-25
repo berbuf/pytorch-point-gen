@@ -4,8 +4,7 @@ import logging
 import torch
 from torch import nn
 
-from utils import zeros, LongTensor,\
-    BaseNetwork, MyGRU, Storage, gumbel_max, flattenSequence, SingleAttnGRU, SequenceBatchNorm
+from utils import zeros, LongTensor, BaseNetwork, MyGRU, Storage, gumbel_max, flattenSequence, SingleAttnGRU, SequenceBatchNorm
 
 # pylint: disable=W0221
 
