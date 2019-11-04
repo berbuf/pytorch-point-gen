@@ -3,10 +3,11 @@ import logging
 import torch
 from torch import nn
 
-from seq2seq_pytorch.utils import zeros, LongTensor, BaseNetwork, MyGRU, Storage, gumbel_max, flattenSequence, SingleAttnGRU, SequenceBatchNorm
+from seq2seq_pytorch.utils import cuda, zeros, LongTensor, BaseNetwork, MyGRU, Storage, gumbel_max, flattenSequence, SingleAttnGRU, SequenceBatchNorm
 from seq2seq_pytorch.network import Network, EmbeddingLayer, PostEncoder, ConnectLayer
 
 from pointer_gru import SingleAttnGRUPointerGen
+
 
 class PointerNetwork(BaseNetwork):
     def __init__(self, param):
@@ -94,7 +95,7 @@ class PointerGenNetwork(nn.Module):
         for a, b in zip(idx, x):
             # batch size, voc_length, post_length
             shape = torch.zeros(att.shape[1], voc.shape[2], att.shape[2])            
-            ret += [ shape.scatter_(1, a, b).sum(2) ]
+            ret += [ cuda(shape.scatter_(1, a, b).sum(2)) ]
 
         return torch.stack(ret, dim=0)
 
