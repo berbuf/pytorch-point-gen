@@ -82,13 +82,21 @@ class PointerGenNetwork(nn.Module):
     def sum_on_voc_index(self, att, voc, idx):
         # reduce text attention to a sum over vocabulary
         # with scatter_method
-        shape = torch.zeros(
-            att.shape[0], att.shape[1], voc.shape[2], att.shape[2])
+
+        # resp_length, batch size, 1, post_length
         idx = torch.transpose(idx, 0, 1)
         idx = torch.cat(
             [idx.reshape(1, idx.shape[0], 1, idx.shape[1])] * att.shape[0])
         x = att.reshape(att.shape[0], att.shape[1], 1, att.shape[2])
-        return shape.scatter_(2, idx, x).sum(3)
+
+        # iterate on resp_length
+        ret = []
+        for a, b in zip(idx, x):
+            # batch size, voc_length, post_length
+            shape = torch.zeros(att.shape[1], voc.shape[2], att.shape[2])            
+            ret += [ shape.scatter_(1, a, b).sum(2) ]
+
+        return torch.stack(ret, dim=0)
 
     def forward(self, incoming):
         inp = Storage()
