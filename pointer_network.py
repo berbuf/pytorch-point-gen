@@ -94,8 +94,8 @@ class PointerGenNetwork(nn.Module):
         ret = []
         for a, b in zip(idx, x):
             # batch size, voc_length, post_length
-            shape = torch.zeros(att.shape[1], voc.shape[2], att.shape[2])            
-            ret += [ cuda(shape.scatter_(1, a, b).sum(2)) ]
+            shape = cuda(torch.zeros(att.shape[1], voc.shape[2], att.shape[2]))
+            ret += [ shape.scatter_(1, a, b).sum(2) ]
 
         return torch.stack(ret, dim=0)
 
