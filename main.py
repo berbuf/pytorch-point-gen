@@ -6,7 +6,7 @@ import json
 from cotk.dataloader import TextSummarization
 # from cotk.wordvector import WordVector, Glove
 
-from utils import debug, try_cache, cuda_init, Storage
+from seq2seq_pytorch.utils import debug, try_cache, cuda_init, Storage
 from pointer_gen import PointerGen
 
 def main(args, load_exclude_set=[], restoreCallback=None):
@@ -20,7 +20,6 @@ def main(args, load_exclude_set=[], restoreCallback=None):
         debug()
 
     logging.info(json.dumps(args, indent=2))
-
     cuda_init(0, args.cuda)
 
     volatile = Storage()
@@ -29,9 +28,11 @@ def main(args, load_exclude_set=[], restoreCallback=None):
 
     data_arg = Storage()
     data_arg.file_id = args.datapath
+    data_arg.max_doc_length = args.max_doc_length
 
     data_class = TextSummarization.load_class(args.dataset)
-    volatile.dm = try_cache(data_class, (*data_arg), args.cache_dir, data_class.__name__) if args.cache else data_class(**data_arg)
+    volatile.dm = (try_cache(data_class, (*data_arg), args.cache_dir, data_class.__name__)
+                   if args.cache else data_class(**data_arg))
 
     param = Storage()
     param.args = args

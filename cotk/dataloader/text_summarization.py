@@ -10,7 +10,7 @@ import numpy as np
 from .._utils.file_utils import get_resource_file_path
 from .._utils import hooks
 from .dataloader import LanguageProcessingBase
-from ..metric import MetricChain, PerplexityMetric, BleuCorpusMetric, SingleTurnDialogRecorder
+from ..metric import MetricChain, PerplexityMetric, RougeCorpusMetric, SingleTurnDialogRecorder
 #from ..metric import MetricChain, ,
 
 # pylint: disable=W0223
@@ -135,7 +135,7 @@ xs
                                            gen_log_prob_key=gen_log_prob_key,
                                            invalid_vocab=invalid_vocab))
         return metric
-    
+
     def get_inference_metric(self, gen_key="gen"):
         '''Get metrics for inference.
             It contains:
@@ -149,8 +149,8 @@ xs
                     A :class:`.metric.MetricChain` object.
             '''
         metric = MetricChain()
-        metric.add_metric(BleuCorpusMetric(self, gen_key=gen_key, \
-                                           reference_allvocabs_key="resp_allvocabs"))
+        metric.add_metric(RougeCorpusMetric(self, gen_key=gen_key, \
+                                            reference_allvocabs_key="resp_allvocabs"))
         metric.add_metric(SingleTurnDialogRecorder(self, gen_key=gen_key))
         return metric
 
@@ -184,11 +184,11 @@ class CNN(TextSummarization):
     '''
 
     @hooks.hook_dataloader
-    def __init__(self, file_id, min_vocab_times=10, max_sent_length=1000, invalid_vocab_times=0):
+    def __init__(self, file_id, min_vocab_times=10, max_doc_length=1000, invalid_vocab_times=0):
         self._file_id = file_id
         self._file_path = get_resource_file_path(file_id)
         self._min_vocab_times = min_vocab_times
-        self._max_sent_length = max_sent_length
+        self._max_doc_length = max_doc_length
         self._invalid_vocab_times = invalid_vocab_times
         super(CNN, self).__init__()
 
@@ -199,7 +199,7 @@ class CNN(TextSummarization):
                                           [['post', 'Sentence'], [
                                               "resp", "Sentence"]],
                                           self._min_vocab_times,
-                                          self._max_sent_length,
+                                          self._max_doc_length,
                                           None,
                                           self._invalid_vocab_times)
 

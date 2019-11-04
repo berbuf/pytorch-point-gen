@@ -40,15 +40,16 @@ Here is an exmample:
 from .metric import MetricBase, MetricChain
 from .precision_recall import BleuPrecisionRecallMetric, EmbSimilarityPrecisionRecallMetric
 from .bleu import BleuCorpusMetric, SelfBleuCorpusMetric, FwBwBleuCorpusMetric, \
-                    MultiTurnBleuCorpusMetric
+    MultiTurnBleuCorpusMetric
+from .rouge import RougeCorpusMetric
 from .perplexity import PerplexityMetric, MultiTurnPerplexityMetric
 from .accuracy import AccuracyMetric
 from .recorder import SingleTurnDialogRecorder, LanguageGenerationRecorder, MultiTurnDialogRecorder
 from .ngram_perplexity import NgramFwBwPerplexityMetric
 
-__all__ = ["MetricBase", "PerplexityMetric", "BleuCorpusMetric", "SelfBleuCorpusMetric", \
-        "FwBwBleuCorpusMetric", "SingleTurnDialogRecorder", "LanguageGenerationRecorder", \
-        "MetricChain", "MultiTurnDialogRecorder", "MultiTurnPerplexityMetric", \
-        "MultiTurnBleuCorpusMetric", "BleuPrecisionRecallMetric", \
-        "EmbSimilarityPrecisionRecallMetric", "AccuracyMetric", \
-		"NgramFwBwPerplexityMetric"]
+__all__ = ["MetricBase", "PerplexityMetric", "BleuCorpusMetric", "SelfBleuCorpusMetric",
+           "FwBwBleuCorpusMetric", "SingleTurnDialogRecorder", "LanguageGenerationRecorder",
+           "MetricChain", "MultiTurnDialogRecorder", "MultiTurnPerplexityMetric",
+           "MultiTurnBleuCorpusMetric", "BleuPrecisionRecallMetric",
+           "EmbSimilarityPrecisionRecallMetric", "AccuracyMetric",
+           "NgramFwBwPerplexityMetric"]

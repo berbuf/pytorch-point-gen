@@ -8,18 +8,19 @@ from torch import nn, optim
 import numpy as np
 import tqdm
 
-from utils import Storage, cuda, BaseModel, SummaryHelper, get_mean, storage_to_list, CheckpointManager, LongTensor
-from network import Network
+from seq2seq_pytorch.utils import Storage, cuda, BaseModel, SummaryHelper, get_mean, storage_to_list, CheckpointManager, LongTensor
+from pointer_network import PointerNetwork
 
 
 class PointerGen(BaseModel):
     def __init__(self, param):
         args = param.args
-        net = Network(param)
+        net = PointerNetwork(param)
         self.optimizer = optim.Adam(net.get_parameters_by_name(), lr=args.lr)
         optimizerList = {"optimizer": self.optimizer}
         checkpoint_manager = CheckpointManager(args.name, args.model_dir,
                                                args.checkpoint_steps, args.checkpoint_max_to_keep, "min")
+        print ("HERE", net)
         super().__init__(param, net, optimizerList, checkpoint_manager)
         self.create_summary()
 
@@ -172,7 +173,8 @@ class PointerGen(BaseModel):
     def test(self, key):
         args = self.param.args
         dm = self.param.volatile.dm
-
+    
+        # Perplexity
         metric1 = dm.get_teacher_forcing_metric()
         batch_num, batches = self.get_batches(dm, key)
         logging.info("eval teacher-forcing")
@@ -188,7 +190,7 @@ class PointerGen(BaseModel):
             metric1.forward(data)
         res = metric1.close()
 
-        metric2 = dm.get_inference_metric()
+        metric = dm.get_inference_metric()
         batch_num, batches = self.get_batches(dm, key)
         logging.info("eval free-run")
         for incoming in tqdm.tqdm(batches, total=batch_num):
@@ -197,14 +199,15 @@ class PointerGen(BaseModel):
                 self.net.detail_forward(incoming)
             data = incoming.data
             data.gen = incoming.gen.w_o.detach().cpu().numpy().transpose(1, 0)
-            metric2.forward(data)
-        res.update(metric2.close())
+            metric.forward(data)
+        res.update(metric.close())
 
         if not os.path.exists(args.out_dir):
             os.makedirs(args.out_dir)
         filename = args.out_dir + "/%s_%s.txt" % (args.name, key)
 
         with open(filename, 'w') as f:
+            print ("here")
             logging.info("%s Test Result:", key)
             for key, value in res.items():
                 if isinstance(value, float) or isinstance(value, str):
@@ -216,4 +219,5 @@ class PointerGen(BaseModel):
                 f.write("gen:\t%s\n" % " ".join(res['gen'][i]))
             f.flush()
         logging.info("result output to %s.", filename)
+
         return {key: val for key, val in res.items() if isinstance(val, (str, int, float))}
