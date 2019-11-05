@@ -28,7 +28,9 @@ def main(args, load_exclude_set=[], restoreCallback=None):
 
     data_arg = Storage()
     data_arg.file_id = args.datapath
+    data_arg.min_vocab_times = args.min_vocab_times
     data_arg.max_doc_length = args.max_doc_length
+    data_arg.invalid_vocab_times = args.min_vocab_times
 
     data_class = TextSummarization.load_class(args.dataset)
     volatile.dm = (try_cache(data_class, (*data_arg), args.cache_dir, data_class.__name__)

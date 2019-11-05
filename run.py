@@ -70,6 +70,7 @@ def run(*argv):
     parser.add_argument('--batchnorm', type=bool, help="", default=False)
     parser.add_argument('--max_sent_length', type=int, help="", default=100)
     parser.add_argument('--max_doc_length', type=int, help="", default=400)
+    parser.add_argument('--min_vocab_times', type=int, help="", default=50)
 
     # Decode parameters
     parser.add_argument('--cov_loss_wt', type=float,
