@@ -11,7 +11,6 @@ from .._utils.file_utils import get_resource_file_path
 from .._utils import hooks
 from .dataloader import LanguageProcessingBase
 from ..metric import MetricChain, PerplexityMetric, RougeCorpusMetric, SingleTurnDialogRecorder
-#from ..metric import MetricChain, ,
 
 # pylint: disable=W0223
 class TextSummarization(LanguageProcessingBase):
@@ -184,7 +183,7 @@ class CNN(TextSummarization):
     '''
 
     @hooks.hook_dataloader
-    def __init__(self, file_id, min_vocab_times=10, max_doc_length=1000, invalid_vocab_times=0):
+    def __init__(self, file_id, min_vocab_times=100, max_doc_length=1000, invalid_vocab_times=100):
         self._file_id = file_id
         self._file_path = get_resource_file_path(file_id)
         self._min_vocab_times = min_vocab_times

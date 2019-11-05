@@ -20,7 +20,6 @@ class PointerGen(BaseModel):
         optimizerList = {"optimizer": self.optimizer}
         checkpoint_manager = CheckpointManager(args.name, args.model_dir,
                                                args.checkpoint_steps, args.checkpoint_max_to_keep, "min")
-        print ("HERE", net)
         super().__init__(param, net, optimizerList, checkpoint_manager)
         self.create_summary()
 

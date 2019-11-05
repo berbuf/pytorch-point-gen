@@ -280,30 +280,7 @@ class CNNResourceProcessor(BaseResourceProcessor):
                 article_lines.append(line)
         return ' '.join(article_lines), ' '.join([ "%s %s %s" % ('<s>', sent, '</s>') for sent in lines[idx:] if sent != "@highlight" ])
 
-    """
-    Download Stanford CoreNLP
-    We will need Stanford CoreNLP to tokenize the data. Download it here and unzip it. Then add the following command to your bash_profile:
-    export CLASSPATH=/path/to/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar    
-    replacing /path/to/ with the path to where you saved the stanford-corenlp-full-2016-10-31 directory.
-
-    see https://github.com/abisee/cnn-dailymail
-
-    def tokenize_stories(self, src_dir, dst_dir):
-        import subprocess
-        stories = os.listdir(src_dir)
-        if not os.path.exists(dst_dir):
-            os.makedirs(dst_dir)
-        with open("mapping.txt", "w") as f:
-            for s in stories:
-                f.write("%s \t %s\n" % (os.path.join(src_dir, s), os.path.join(dst_dir, s)))
-        command = ['java', 'edu.stanford.nlp.process.PTBTokenizer', '-ioFileList', '-preserveLines', 'mapping.txt']
-        if subprocess.call(command):
-            raise(Exception("Java tokenizer not installed"))
-        os.remove("mapping.txt")
-    """
-
     def _postprocess(self, src_dir, dest_dir, key):
-        #self.tokenize_stories(src_dir, tmp_dir)
         with open(os.path.join(dest_dir, key + ".txt") , 'w') as f:
             for s in os.listdir(src_dir):
                 file_path = os.path.join(src_dir, s)
