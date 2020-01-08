@@ -260,11 +260,13 @@ class SSTResourceProcessor(BaseResourceProcessor):
 class CNNResourceProcessor(BaseResourceProcessor):
     '''Processor for CNN dataset
     '''
+
     def get_art_abs(self, file_path):
         def fix_missing_period(line):
             """Adds a period to a line that is missing a period"""
             dm_single_close_quote, dm_double_close_quote = u'\u2019', u'\u201d'
-            END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_double_close_quote, ")"]
+            END_TOKENS = ['.', '!', '?', '...', "'", "`", '"',
+                          dm_single_close_quote, dm_double_close_quote, ")"]
             if "@highlight" in line:
                 return line
             if line=="":
@@ -272,13 +274,18 @@ class CNNResourceProcessor(BaseResourceProcessor):
             if line[-1] in END_TOKENS:
                 return line
             return line + " ."
-        lines, article_lines = [ fix_missing_period(l.strip().lower()) for l in open(file_path, "r").readlines() ], []
+
+        lines, article_lines = [ fix_missing_period(l.strip().lower())
+                                 for l in open(file_path, "r").readlines() ], []
+        idx = 0
         for idx, line in enumerate(lines):
             if line.startswith("@highlight"):
                 break
             if line != "":
                 article_lines.append(line)
-        return ' '.join(article_lines), ' '.join([ "%s %s %s" % ('<s>', sent, '</s>') for sent in lines[idx:] if sent != "@highlight" ])
+        return ' '.join(article_lines), ' '.join([ "%s %s %s" % ('<s>', sent, '</s>')
+                                                   for sent in lines[idx:]
+                                                   if sent != "@highlight" ])
 
     def _postprocess(self, src_dir, dest_dir, key):
         with open(os.path.join(dest_dir, key + ".txt") , 'w') as f:
