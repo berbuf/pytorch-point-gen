@@ -1,5 +1,5 @@
 r"""
-Containing some classes and functions about bleu evaluating results of models.
+Containing some classes and functions about rouge evaluating results of models.
 """
 import random
 import os
